@@ -1,4 +1,4 @@
-// member-model 0.4.2 — spawn route capability only.
+// member-model 1.0.0 — spawn route capability only.
 //
 // No personal model is shipped. Fresh spawn follows the parent unless
 // arm_spawn_route armed a one-shot for that agent. The one-shot is consumed
