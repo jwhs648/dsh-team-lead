@@ -1,6 +1,6 @@
-# member-model
+# dsh-team-lead
 
-给 DeepSeek Harness 的下一次 fresh spawn 指定模型和思考强度。不带任何人的默认模型。只在 `dsh 0.1.7-rc.1` 上测试过，其他版本会被拒绝。
+DeepSeek Harness 的队长用法：`team-lead` skill，外加它依赖的 `member-model` 插件。插件给下一次 fresh spawn 指定模型和思考强度，不带任何人的默认模型。只在 `dsh 0.1.7-rc.1` 上测试过，其他版本会被拒绝。
 
 fork 不受影响，始终跟随主模型。没有登记一次性路由时，fresh spawn 也跟随主模型。
 
@@ -11,7 +11,7 @@ fork 不受影响，始终跟随主模型。没有登记一次性路由时，fre
 1. 把本仓库加进用户正在使用的 profile，并启用 bundle `member-model`。例如：
 
    ```sh
-   dsh plugin --profile <profile> add https://github.com/jwhs648/member-model
+   dsh plugin --profile <profile> add https://github.com/jwhs648/dsh-team-lead
    ```
 
    `<profile>` 用用户当前的 profile。装完重启宿主。重启前插件不会生效。
@@ -21,7 +21,7 @@ fork 不受影响，始终跟随主模型。没有登记一次性路由时，fre
    - Windows: `%USERPROFILE%\.dsh\skills\team-lead\SKILL.md`
    - 其他系统: `~/.dsh/skills/team-lead/SKILL.md`
 
-   发布仓库里的默认路由是空的。不要用仓库作者自己的模型。
+   发布仓库里的默认路由是空的。不要用仓库作者自己的模型。如果用户本机已经有自己写好的 `team-lead`，先问要不要覆盖。
 
 3. 问用户一次：默认的 provider、model、reasoningEffort。把答案写进刚复制的那份 skill 的「默认路由」一节。用户没回答之前，不要用非主模型创建队员。
 
