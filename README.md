@@ -1,5 +1,19 @@
 # dsh-team-lead
 
+```mermaid
+flowchart TB
+  user[用户] -->|定一次默认模型| skill[team-lead skill]
+  skill -->|队长每次创建前读取| lead[队长]
+  lead -->|要用别的模型，且和自己不同| arm[arm_spawn_route]
+  arm -->|只作用于下一次 fresh| member[队员]
+  lead -->|不登记，或使用 fork| same[跟随队长自己的模型]
+  lead <-->|团队消息| member
+  member <-->|团队消息| other[其他队员]
+  plugin[member-model 插件] -.->|提供登记能力，不读 skill| arm
+```
+
+skill 记住默认模型，并规定什么时候建队员、怎么接着沟通。插件不带任何人的模型，只把下一次 fresh spawn 换成登记过的模型和思考强度。没登记，或者走 fork，就跟随队长。
+
 DeepSeek Harness 的队长用法：`team-lead` skill，外加它依赖的 `member-model` 插件。插件给下一次 fresh spawn 指定模型和思考强度，不带任何人的默认模型。只在 `dsh 0.1.7-rc.1` 上测试过，其他版本会被拒绝。
 
 fork 不受影响，始终跟随主模型。没有登记一次性路由时，fresh spawn 也跟随主模型。
