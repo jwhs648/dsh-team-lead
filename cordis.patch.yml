@@ -1,0 +1,5 @@
+- insert:
+    - id: member-model
+      name: member-model
+      config:
+        inherit: true
