@@ -1,6 +1,6 @@
 {
   "name": "member-model",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh": "0.1.7-rc.1"
+    "@deepseek-ai/dsh": "0.1.7-rc.1 || 0.1.7-rc.2"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "3.18.4"
