@@ -6,6 +6,9 @@
   "type": "module",
   "description": "One-shot fresh-spawn route. No personal default model.",
   "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
   "exports": {
     ".": "./index.js",
     "./package.json": "./package.json"
