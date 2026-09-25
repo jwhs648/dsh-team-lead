@@ -128,7 +128,7 @@ test("核心：登记后普通 fresh 子代理（start / 非建队员的 startCo
   const h = createHarness();
   const agent = makeAgent();
   await h.arm({ provider: "prov", model: "mod", reasoningEffort: "high" }, agent);
-  const workflowChild = { parent: agent, agentOptions: { provider: "st", model: "model-c" } };
+  const workflowChild = { parent: agent, agentOptions: { provider: "provider-a", model: "model-c" } };
   await h.start("spawn", workflowChild);
   assert.equal(h.calls.at(-1).request, workflowChild);
   const background = { parent: agent };

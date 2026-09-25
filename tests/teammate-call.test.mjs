@@ -18,16 +18,16 @@ const tick = () => new Promise((resolve) => setImmediate(resolve));
 test("复现旧问题已消失：登记后后台 workflow 子代理带显式模型，不被改写也不偷走登记", async () => {
   const h = createHarness();
   const agent = lead();
-  await h.arm({ provider: "st", model: "deepseek-v4.1-flash", reasoningEffort: "high" }, agent);
-  const workflowChild = { parent: agent, agentOptions: { provider: "st", model: "模型C" } };
+  await h.arm({ provider: "provider-a", model: "model-a", reasoningEffort: "high" }, agent);
+  const workflowChild = { parent: agent, agentOptions: { provider: "provider-a", model: "模型C" } };
   await h.start("spawn", workflowChild);
   assert.equal(h.calls.at(-1).request, workflowChild);
-  assert.deepEqual(h.calls.at(-1).request.agentOptions, { provider: "st", model: "模型C" });
+  assert.deepEqual(h.calls.at(-1).request.agentOptions, { provider: "provider-a", model: "模型C" });
 
   const result = await h.spawnTeammate({ name: "reviewer" }, agent);
   assert.equal(result.isError, false);
-  assert.deepEqual(h.lastTeammateOptions(), { provider: "st", model: "deepseek-v4.1-flash", reasoningEffort: "high" });
-  assert.equal(noteOf(result), 'member-model: "reviewer" → st/deepseek-v4.1-flash · high (armed route; verified on the live teammate).');
+  assert.deepEqual(h.lastTeammateOptions(), { provider: "provider-a", model: "model-a", reasoningEffort: "high" });
+  assert.equal(noteOf(result), 'member-model: "reviewer" → provider-a/model-a · high (armed route; verified on the live teammate).');
 });
 
 test("建队员进行中，并发的其他创建（同一队长的后台子代理）拿不到这次登记", async () => {
@@ -452,8 +452,8 @@ const hostChildOptions = (parentOptions, requested, parent) => {
   return resolveChildOptions(inherited, requested);
 };
 const switchedLead = (id = "lead") => makeAgent(id, {
-  options: { provider: "st", model: "deepseek-v4.1-flash" },
-  session: { header: { id }, requestHeader: () => ({ config: { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium", maxTokens: 128000 } }) },
+  options: { provider: "provider-a", model: "model-a" },
+  session: { header: { id }, requestHeader: () => ({ config: { provider: "provider-b", model: "model-b", reasoningEffort: "medium", maxTokens: 128000 } }) },
 });
 
 test("队长在界面切换过模型：follow 按队长当前路由核实，不再误报", async () => {
@@ -461,19 +461,19 @@ test("队长在界面切换过模型：follow 按队长当前路由核实，不�
   const agent = switchedLead();
   await h.arm({ follow: true }, agent);
   const result = await h.spawnTeammate({ name: "follower" }, agent);
-  assert.equal(noteOf(result), 'member-model: "follower" → stgpt/gpt-6-astra · medium (armed follow, same as the lead; verified on the live teammate).');
-  assert.deepEqual((await h.get(agent)).applied.at(-1), { teammate: "follower", source: "follow", route: { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium" }, verified: true });
+  assert.equal(noteOf(result), 'member-model: "follower" → provider-b/model-b · medium (armed follow, same as the lead; verified on the live teammate).');
+  assert.deepEqual((await h.get(agent)).applied.at(-1), { teammate: "follower", source: "follow", route: { provider: "provider-b", model: "model-b", reasoningEffort: "medium" }, verified: true });
 });
 
 test("队长在界面切换过模型：关闭 requireArm 后未登记跟随，同样按当前路由核实", async () => {
   const h = createHarness({ childOptions: hostChildOptions, config: { inherit: true, requireArm: false } });
   const agent = switchedLead();
   const result = await h.spawnTeammate({ name: "plain" }, agent);
-  assert.equal(noteOf(result), 'member-model: "plain" → stgpt/gpt-6-astra · medium (nothing armed, follows the lead; requireArm is off; verified on the live teammate).');
+  assert.equal(noteOf(result), 'member-model: "plain" → provider-b/model-b · medium (nothing armed, follows the lead; requireArm is off; verified on the live teammate).');
 });
 
 test("队长路由：请求头优先；还没发过请求或读取出错时退回创建参数", () => {
-  assert.deepEqual(leadRoute(switchedLead()), { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium" });
+  assert.deepEqual(leadRoute(switchedLead()), { provider: "provider-b", model: "model-b", reasoningEffort: "medium" });
   assert.deepEqual(leadRoute(makeAgent("a", { options: { provider: "p", model: "m", reasoningEffort: "low" }, session: { requestHeader: () => undefined } })), { provider: "p", model: "m", reasoningEffort: "low" });
   assert.deepEqual(leadRoute(makeAgent("b", { options: { provider: "p", model: "m" }, session: { requestHeader: () => { throw new Error("closed"); } } })), { provider: "p", model: "m" });
   assert.deepEqual(leadRoute(makeAgent("c", { options: { provider: "p", model: "m", reasoningEffort: "high" }, session: { requestHeader: () => ({ config: { provider: "q", model: "n" } }) } })), { provider: "q", model: "n" }, "请求头没写强度时不沿用创建参数里的强度");

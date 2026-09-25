@@ -24,7 +24,7 @@ const version = JSON.parse(readFileSync(join(repo, "package.json"), "utf8")).ver
 const template = readFileSync(join(sourceDir, "SKILL.md"), "utf8");
 const reference = readFileSync(join(sourceDir, "references", "spawn-route.md"), "utf8");
 const released111 = readFileSync(new URL("./fixtures/team-lead-skill-1.1.1.md", import.meta.url), "utf8");
-const ROUTE = { provider: "st", model: "deepseek-v4.1-flash", reasoningEffort: "high" };
+const ROUTE = { provider: "provider-a", model: "model-a", reasoningEffort: "high" };
 
 // 模拟你电脑上那份：1.1.1 模板，填了三项值，安装时把第一句改成了「已按用户选择写好。」，CRLF 换行。
 const installed111 = fillRoute(released111, ROUTE).replace("这里还没设置。", "已按用户选择写好。").replace(/\n/g, "\r\n");
