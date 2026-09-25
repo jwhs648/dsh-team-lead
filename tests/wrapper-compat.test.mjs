@@ -1,7 +1,8 @@
-// 包装链生命周期兼容性（task-7）：own wrapper 保留与 descriptor 复原、后装 wrapper 安全、
+// 包装链生命周期兼容性：own wrapper 保留与 descriptor 复原、后装 wrapper 安全、
 // 卸载后残留 wrapper 纯透传、同 runtime 重复 apply no-op（runtime 级识别）、
 // 不可配置属性 / 第二方法安装失败 / 工具注册失败都不留半安装、this/额外参数/返回/异常透传。
-// 全部使用假 runtime，不请求模型、不碰安装副本。48 条既有基线保持不变。
+// 全部使用假 runtime，不请求模型、不碰安装副本。
+// 1.2.0 起登记只由建队员调用消费，需要「有路由」路径时用插件默认路由（inherit=false）或 spawn_teammate。
 import test from "node:test";
 import assert from "node:assert/strict";
 import { apply } from "../index.js";
@@ -46,6 +47,7 @@ function bareCtx(protoMembers) {
     logger: { info() {}, warn: (message) => warnings.push(message) },
     get() { return undefined; },
     effect(fn) { return fn(); },
+    on() { return () => {}; },
   };
   return { ctx, runtime, registered, warnings };
 }
@@ -194,8 +196,8 @@ test("同 runtime 重复 apply：整体 no-op + warn，不叠加、不注册第�
   disposeList(secondDisposers);
   assert.equal(base.runtime[START], firstWrapper, "卸载无效的第二份不得影响第一份");
   await base.registered.get("arm_spawn_route").execute({ provider: "rp", model: "rm" }, { agent });
-  await base.runtime[START]("spawn", { parent: agent });
-  assert.deepEqual(base.calls.at(-1).request.agentOptions, { provider: "rp", model: "rm" });
+  await base.dispatch("spawn_teammate", { name: "a" }, agent);
+  assert.deepEqual(base.calls.at(-1).spec.request.agentOptions, { provider: "rp", model: "rm" });
 
   disposeList(firstDisposers);
   assert.equal(Object.hasOwn(base.runtime, START), false);
@@ -237,17 +239,18 @@ test("完全卸载后再 apply 能正常安装并生效", async () => {
 
 test("this 透传：无路由、有路由、continuable 三条路径都用调用者 receiver", async () => {
   const base = createCtx();
-  apply(base.ctx, { inherit: true });
+  apply(base.ctx, { inherit: false, provider: "p", model: "m" });
   const agent = makeAgent();
 
   const receiver1 = { tag: "r1" };
-  await Reflect.apply(base.runtime[START], receiver1, ["spawn", { parent: agent }]);
+  await Reflect.apply(base.runtime[START], receiver1, ["spawn", { parent: agent, agentOptions: { model: "own" } }]);
   assert.equal(base.calls[0].receiver, receiver1);
+  assert.deepEqual(base.calls[0].request.agentOptions, { model: "own" }, "写明模型的请求走无路由路径");
 
-  await base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
   const receiver2 = { tag: "r2" };
   await Reflect.apply(base.runtime[START], receiver2, ["spawn", { parent: agent }]);
   assert.equal(base.calls[1].receiver, receiver2);
+  assert.deepEqual(base.calls[1].request.agentOptions, { provider: "p", model: "m" });
 
   const receiver3 = { tag: "r3" };
   await Reflect.apply(base.runtime[CONT], receiver3, [{ provider: "spawn", request: { parent: agent } }]);
@@ -256,18 +259,18 @@ test("this 透传：无路由、有路由、continuable 三条路径都用调用
 
 test("额外实参透传：非 spawn、spawn 无路由、spawn 有路由、continuable 都不吞参数", async () => {
   const base = createCtx();
-  apply(base.ctx, { inherit: true });
+  apply(base.ctx, { inherit: false, provider: "p", model: "m" });
   const agent = makeAgent();
 
   await Reflect.apply(base.runtime[START], base.runtime, ["fork", { parent: agent }, "extra", 42]);
   assert.deepEqual(base.calls.at(-1).args, ["fork", { parent: agent }, "extra", 42]);
 
-  await Reflect.apply(base.runtime[START], base.runtime, ["spawn", { parent: agent }, "extra"]);
+  await Reflect.apply(base.runtime[START], base.runtime, ["spawn", { parent: agent, agentOptions: { model: "own" } }, "extra"]);
   assert.equal(base.calls.at(-1).args.length, 3);
   assert.equal(base.calls.at(-1).args[2], "extra");
 
-  await base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
   await Reflect.apply(base.runtime[START], base.runtime, ["spawn", { parent: agent }, "extra", 7]);
+  assert.deepEqual(base.calls.at(-1).request.agentOptions, { provider: "p", model: "m" });
   assert.equal(base.calls.at(-1).args.length, 4);
   assert.equal(base.calls.at(-1).args[2], "extra");
   assert.equal(base.calls.at(-1).args[3], 7);
@@ -313,12 +316,11 @@ test("异常透传：无路由时下一层同步抛非 Error，原样抛出", as
   assert.equal(caught, thrown);
 });
 
-test("异常透传：消费路由后下一层抛 Error，identity 抛出且登记恢复", async () => {
+test("异常透传：应用路由后下一层抛 Error，identity 抛出；建队员失败时登记恢复", async () => {
   const thrown = new Error("raw-boom");
-  const base = createCtx({ startImpl: () => { throw thrown; } });
-  apply(base.ctx, { inherit: true });
+  const base = createCtx({ startImpl: () => { throw thrown; }, continuableImpl: () => { throw thrown; } });
+  apply(base.ctx, { inherit: false, provider: "dp", model: "dm" });
   const agent = makeAgent();
-  await base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
   let caught;
   try {
     await base.runtime[START]("spawn", { parent: agent });
@@ -326,6 +328,20 @@ test("异常透传：消费路由后下一层抛 Error，identity 抛出且登�
     caught = error;
   }
   assert.equal(caught, thrown);
+  assert.deepEqual(base.calls.at(-1).request.agentOptions, { provider: "dp", model: "dm" });
+
+  let caught2;
+  try {
+    await base.runtime[CONT]({ provider: "spawn", request: { parent: agent } });
+  } catch (error) {
+    caught2 = error;
+  }
+  assert.equal(caught2, thrown);
+
+  await base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
+  const result = await base.dispatch("spawn_teammate", { name: "a" }, agent);
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /raw-boom/);
   const view = await base.registered.get("get_spawn_route").execute({}, { agent });
   assert.deepEqual(view.pending, { provider: "p", model: "m" });
 });
@@ -489,22 +505,17 @@ test("dispose 时 preflight 中的 spawn：解析后转为纯透传，不应用�
   for (const entry of ENTRY_POINTS) {
     const { llm, gates } = gatedLlm();
     const base = createCtx({ llm });
-    const disposers = applyTracked(base, { inherit: true });
+    const disposers = applyTracked(base, { inherit: false, provider: "p", model: "m" });
     const agent = makeAgent();
-
-    const arming = base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
-    assert.equal(gates.length, 1);
-    gates[0].resolve({});
-    assert.equal((await arming).armed, true);
 
     const request = { parent: agent };
     const inflight = entry === "start"
       ? base.runtime[START]("spawn", request)
       : base.runtime[CONT]({ provider: "spawn", request });
-    assert.equal(gates.length, 2, "spawn preflight 已开始");
+    assert.equal(gates.length, 1, "spawn preflight 已开始");
 
     disposeList(disposers);
-    gates[1].resolve({});
+    gates[0].resolve({});
 
     const result = await inflight;
     assert.equal(result.ok, true);
@@ -519,21 +530,17 @@ test("dispose 时 preflight 中的 spawn：失败后原样抛出且不调用下�
   for (const entry of ENTRY_POINTS) {
     const { llm, gates } = gatedLlm();
     const base = createCtx({ llm });
-    const disposers = applyTracked(base, { inherit: true });
+    const disposers = applyTracked(base, { inherit: false, provider: "p", model: "m" });
     const agent = makeAgent();
-
-    const arming = base.registered.get("arm_spawn_route").execute({ provider: "p", model: "m" }, { agent });
-    gates[0].resolve({});
-    await arming;
 
     const request = { parent: agent };
     const inflight = entry === "start"
       ? base.runtime[START]("spawn", request)
       : base.runtime[CONT]({ provider: "spawn", request });
-    assert.equal(gates.length, 2);
+    assert.equal(gates.length, 1);
 
     disposeList(disposers);
-    gates[1].reject(new Error("route gone"));
+    gates[0].reject(new Error("route gone"));
 
     await assert.rejects(inflight, /is unavailable: route gone/);
     assert.equal(base.calls.length, 0, "preflight 失败不得调用下一层");
@@ -622,8 +629,8 @@ test("旧 disposer 多次调用、且在新安装后再调用，不得拆掉新�
 
   const agent = makeAgent();
   await base.registered.get("arm_spawn_route").execute({ provider: "rp", model: "rm" }, { agent });
-  await base.runtime[START]("spawn", { parent: agent });
-  assert.deepEqual(base.calls.at(-1).request.agentOptions, { provider: "rp", model: "rm" });
+  await base.dispatch("spawn_teammate", { name: "a" }, agent);
+  assert.deepEqual(base.calls.at(-1).spec.request.agentOptions, { provider: "rp", model: "rm" });
 
   await base.runtime[START]("spawn", { parent: makeAgent() });
   assert.deepEqual(base.calls.at(-1).request.agentOptions, { provider: "dp", model: "dm" });
@@ -705,4 +712,60 @@ test("原型 accessor（startContinuable）的 getter 必须以 runtime 为 rece
   const agent2 = makeAgent();
   await base.runtime[CONT]({ provider: "spawn", request: { parent: agent2 } });
   assert.equal(base.calls.at(-1).spec.request.agentOptions, undefined);
+});
+
+test("宿主没有 ctx.on：apply 抛 TypeError，不留包装与工具", () => {
+  const base = createCtx();
+  delete base.ctx.on;
+  assert.throws(() => apply(base.ctx, { inherit: true }), /ctx\.on/);
+  assert.equal(Object.hasOwn(base.runtime, START), false);
+  assert.equal(Object.hasOwn(base.runtime, CONT), false);
+  assert.equal(base.registered.size, 0);
+});
+
+test("事件监听注册失败：apply 抛错并回滚包装、工具与已挂监听", () => {
+  for (const failing of ["tools/execute", "tools/post-execute", "agent/created", "agent/disposed"]) {
+    const base = createCtx();
+    const realOn = base.ctx.on;
+    base.ctx.on = (name, listener) => {
+      if (name === failing) throw new Error("on denied");
+      return realOn(name, listener);
+    };
+    assert.throws(() => apply(base.ctx, { inherit: true }), /on denied/, failing);
+    assert.equal(Object.hasOwn(base.runtime, START), false, failing);
+    assert.equal(base.registered.size, 0, failing);
+    for (const name of ["tools/execute", "tools/post-execute", "agent/created", "agent/disposed"]) {
+      assert.equal(base.listenerCount(name), 0, `${failing} → ${name}`);
+    }
+    base.ctx.on = realOn;
+    apply(base.ctx, { inherit: true });
+    assert.equal(base.registered.size, 3, "失败不留安装记录，修好后可正常安装");
+    base.disposeAll();
+  }
+});
+
+test("重复 apply 不叠加事件监听；旧 disposer 不摘掉新安装的监听", () => {
+  const base = createCtx();
+  const first = applyTracked(base, { inherit: true });
+  applyTracked(base, { inherit: true });
+  assert.equal(base.listenerCount("tools/execute"), 1);
+  assert.equal(base.listenerCount("agent/created"), 1);
+  disposeList(first);
+  assert.equal(base.listenerCount("tools/execute"), 0);
+  const second = applyTracked(base, { inherit: true });
+  disposeList(first);
+  assert.equal(base.listenerCount("tools/execute"), 1, "旧 disposer 再调用不得摘掉新监听");
+  assert.equal(base.listenerCount("tools/post-execute"), 1);
+  disposeList(second);
+  assert.equal(base.listenerCount("tools/execute"), 0);
+});
+
+test("插件只登记一个 effect，卸载一次即全部回收", () => {
+  const base = createCtx();
+  const disposers = applyTracked(base, { inherit: true });
+  assert.equal(disposers.length, 1);
+  disposers[0]();
+  assert.equal(base.registered.size, 0);
+  assert.equal(Object.hasOwn(base.runtime, START), false);
+  assert.equal(base.listenerCount("agent/disposed"), 0);
 });

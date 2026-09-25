@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "队员模型",
+    "description": "为 Agent Teams 队长的下一位 fresh 队员登记一次性模型路由，并回报队员实际使用的路由。插件不自带模型。"
+  }
+}

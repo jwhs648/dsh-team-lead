@@ -1,16 +1,20 @@
 {
   "name": "member-model",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "license": "MIT",
   "private": true,
   "type": "module",
-  "description": "One-shot fresh-spawn route. No personal default model.",
+  "description": "One-shot model route for the Team lead's next fresh teammate. No personal default model.",
+  "icon": "./icon.svg",
   "main": "index.js",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "kernel-check": "node scripts/kernel-check.mjs"
   },
   "exports": {
     ".": "./index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
     "./package.json": "./package.json"
   },
   "peerDependencies": {
