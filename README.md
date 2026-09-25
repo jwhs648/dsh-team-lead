@@ -168,6 +168,7 @@ npm test
 - kernel-check 对 `0.1.7-rc.1` 与 `0.1.7-rc.2` 均为 21/21 PASS，在 Linux 与 Windows 上都能运行。
 - 实机验收（2026-09-25，DSH 0.1.7-rc.2，run_code 模式）：
   - 通过：拦截未登记、按登记创建（同一步成对写）、fork、失败恢复、清除、applied 记录、对队员隐藏路由工具；`/team-lead` 实际组队、交代、验收和按 applied 汇报。
-  - 发现并修复两个问题：队长在界面切换模型后，follow 被误报 WARNING；run_code 模式下队长看不到 `member-model:` 说明。修复后需要按 `scripts/live-checklist.md` 复验这两项。
+  - 发现并修复两个问题：队长在界面切换模型后，follow 被误报 WARNING；run_code 模式下队长看不到 `member-model:` 说明。
+  - 修复后在同一台宿主上复验通过：队长切换到另一个模型后登记 follow，run_code 运行结果之后出现了「与队长当前路由一致、已核实」的说明，队长能看到并转述。
 
 更早版本的验收记录见 `CHANGELOG.md`。
