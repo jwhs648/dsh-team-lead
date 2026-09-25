@@ -28,7 +28,11 @@ function delegationDepthOf(agent) {
 \tconst runtime = agent.options.subagentDepth;
 \treturn Math.max(agent.session.header.delegationDepth ?? 0, runtime ?? 0);
 }
+function parentAgentOptionsForDelegation(parent) {
+\tconst requestConfig = parent.session.requestHeader()?.config;
+}
 function resolveChildAgentOptions(parent, requested, childDepth) {
+\tconst parentOptions = parentAgentOptionsForDelegation(parent);
 \tconst resolved = { subagentDepth: childDepth };
 \tif ((resolved.provider !== parentProvider || resolved.model !== parentModel) && requested?.reasoningEffort === void 0) delete resolved.reasoningEffort;
 }
@@ -52,6 +56,8 @@ class Runtime {
 \t\tif (unknown.length > 0) throw new Error(\`tools.restrict() names unknown global tool\`);
 \t\t\trestrictableNames.add(name);
 \t\tconst token = createExecutionToken();
+\t\t\t\t\tparent: exec.token,
+\t\t\t\t\t\t\tfor (const context of result.additionalContexts ?? []) exec.deferContext(context);
 \t\tif (!tool?.isConcurrencySafe) return { kind: "exclusive" };
 \t\t\tconst result = await this.ctx.waterfall(carrier, "tools/execute", mutableExec, () => this.dispatchToolBody(mutableExec));
 \t\t\treturn toolErrorResult(error);
@@ -241,6 +247,17 @@ test("spawn_teammate 变成可并行调用时 K20 FAIL", () => {
     const k20 = runChecks(root, VERSION, manifest, skillText).find((result) => result.id === "K20");
     assert.equal(k20.level, "FAIL");
     assert.ok(k20.missing.some((item) => item.includes("isConcurrencySafe")));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("宿主不再把子调用的 additionalContexts 转交给 run_code 时 K21 FAIL", () => {
+  const original = FILES["dsh-tools/lib/index.js"];
+  const root = fixture({ "dsh-tools/lib/index.js": original.replace("for (const context of result.additionalContexts ?? []) exec.deferContext(context);", "") });
+  try {
+    const k21 = runChecks(root, VERSION, manifest, skillText).find((result) => result.id === "K21");
+    assert.equal(k21.level, "FAIL");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

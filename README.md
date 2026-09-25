@@ -6,7 +6,7 @@ flowchart TB
   skill -->|组队时加载| lead[队长]
   lead -->|每位 fresh 队员前登记路由或 follow| arm[arm_spawn_route]
   arm -->|只给紧接着的这一次 spawn_teammate| member[fresh 队员]
-  member -.->|结果末尾附 member-model: 实际路由| lead
+  member -.->|member-model: 说明实际路由| lead
   lead -->|需要已有对话时 fork，无需登记| forked[fork 队员]
   lead <-->|团队消息| member
   member <-->|团队消息| other[其他队员]
@@ -26,13 +26,15 @@ skill 不预设成员模型的能力、速度或价格，而是按任务结构�
 1. 把本仓库作为 bundle 装进用户正在使用的 profile，并启用 `member-model`：
 
    - 首选：在 DSH 会话里调用 `plugin_manager`，`action` 为 `install_bundle`，`target` 为 `https://github.com/jwhs648/dsh-team-lead`（要固定版本时，用对应 tag 的 tarball 地址）。该操作需要用户批准。
-   - 备选（无法使用 `plugin_manager` 时）：
+   - 备选（会话里没有 `plugin_manager` 工具时，这取决于预设）：在 DSH 网页的插件页安装，或用下面的命令：
 
      ```sh
      dsh plugin --profile <profile> add https://github.com/jwhs648/dsh-team-lead
      ```
 
      `<profile>` 用用户当前的 profile，装完重启宿主。
+
+   如果 pnpm 报 `ERR_PNPM_UNEXPECTED_STORE`，说明执行命令的 pnpm 与当初安装 profile 的 pnpm 大版本不同（store 不同）。换用同一大版本的 pnpm 再装；需要时只对这一条命令调整 PATH。
 
    看 `install_bundle` 返回的 `application`：
 
@@ -64,7 +66,7 @@ skill 不预设成员模型的能力、速度或价格，而是按任务结构�
 ## 装好之后的行为（摘要）
 
 - 每位 fresh 队员创建前，队长先登记路由（provider、model、reasoningEffort）或 `{"follow": true}`，再创建。
-- 创建结果末尾有一行 `member-model:`，写明队员实际拿到的路由；不符时显示 `WARNING`，队长会停下来告诉你。
+- 每次创建都会给出一行 `member-model:` 说明，写明队员实际拿到的路由。普通调用时它附在结果末尾；队长在 run_code 里调用时，它作为运行结果之后的一条提示出现。不符时显示 `WARNING`，队长会停下来告诉你。
 - 插件在内存里记下每位队长最近 16 位队员的实际路由（`get_spawn_route` 的 `applied`），最终汇报据此列出。
 - 没登记的 fresh 创建会被拒绝（`requireArm`，可以关闭）；fork 不受影响，始终跟随队长。
 - 登记只给队长紧接着的那一次建队员。workflow 子代理等其他创建不受影响；写明 provider/model 的请求，也不会被插件默认路由改写。
@@ -107,7 +109,7 @@ skill 不预设成员模型的能力、速度或价格，而是按任务结构�
 `clear_spawn_route({})` 只操作调用者自己的一次性登记，返回 `{ cleared: boolean, route?: Route, follow?: true }`。实际删除登记时为 `cleared:true` 并附被删的路由或 `follow:true`；没有可见登记时为 `false`，重复清除不报错。无论是否删到登记，它都会使之前尚未提交的登记和之前创建的失败恢复失效，避免旧路由重新出现。
 
 - 清除不修改插件默认路由，不影响其他 agent，不中止已经开始的创建，也不会把 fork 改成别的模型。
-- 未清除、未重新登记时，建队员失败（包括中止错误）会恢复这次登记，方便重试；失败结果末尾的 `member-model:` 行说明登记是否还在。不再重试时应显式清除。
+- 未清除、未重新登记时，建队员失败（包括中止错误）会恢复这次登记，方便重试；`member-model:` 说明会写明登记是否还在。不再重试时应显式清除。
 - 先前的创建失败不能覆盖更新的登记，也不能在更新的登记已被使用后恢复旧路由。队长 agent 释放时，它的登记、恢复代次和 `applied` 一并清理。
 - `arm_spawn_route` 预检期间发生 clear 或另一次登记成功提交时，该次 arm 返回 `{ armed:false, route }`，其中 route 是本次请求的路由，不代表当前登记。重叠的登记以首个成功提交者为准；顺序调用仍会替换未使用的登记。通过 `get_spawn_route` 核对后，按需要重新登记，不要无条件自动重试。
 - 清除后，fresh 队员仍可能使用插件默认路由；没有插件默认路由且 `requireArm` 开启时，会被要求重新登记。
@@ -138,7 +140,8 @@ peerDependencies 严格固定为已验证版本。DSH 发布新版本后，按�
      - skill 提到的宿主工具仍然存在；
      - skill 交给宿主 team:policy 的规则（target、queued、任务板、等待、共享目录等）仍在；
      - skill 引用的名额、任务权限、等待时长，以及「fork 只继承已完成的轮次」都没有变化；
-     - 同一步里的 `arm_spawn_route → spawn_teammate` 仍按顺序逐个执行（两者都是独占调用）。
+     - 同一步里的 `arm_spawn_route → spawn_teammate` 仍按顺序逐个执行（两者都是独占调用）；
+     - 子 agent 继承的仍是队长最近一次请求头里的路由（插件据此核实跟随），run_code 里子调用的 additionalContexts 仍会转交给运行结果（插件据此送达说明）。
 
    每项输出 PASS/FAIL 和「文件:行号」证据；有 FAIL 时退出码为 1。
 
@@ -161,8 +164,10 @@ npm test
 
 ### 1.2.0 验证（2026-09-25）
 
-- 183 项自动化测试通过（Linux 上的 Node.js 20 与 Windows 上的 Node.js 24）：路由生命周期、清除、建队员调用（登记消费、requireArm、结果行与核实）、工具可见性与释放清理、包装兼容性、包元数据、skill 结构与插件/宿主一致性，以及 kernel-check 和 skill 同步脚本的自检。
-- kernel-check 对 `0.1.7-rc.1` 与 `0.1.7-rc.2` 均为 20/20 PASS，在 Linux 与 Windows 上都能运行。
-- 尚未在真实宿主上完成实机验收；按 `scripts/live-checklist.md` 执行后补记。
+- 190 项自动化测试通过（Linux 上的 Node.js 20 与 Windows 上的 Node.js 24）：路由生命周期、清除、建队员调用（登记消费、requireArm、结果行与核实）、工具可见性与释放清理、包装兼容性、包元数据、skill 结构与插件/宿主一致性，以及 kernel-check 和 skill 同步脚本的自检。
+- kernel-check 对 `0.1.7-rc.1` 与 `0.1.7-rc.2` 均为 21/21 PASS，在 Linux 与 Windows 上都能运行。
+- 实机验收（2026-09-25，DSH 0.1.7-rc.2，run_code 模式）：
+  - 通过：拦截未登记、按登记创建（同一步成对写）、fork、失败恢复、清除、applied 记录、对队员隐藏路由工具；`/team-lead` 实际组队、交代、验收和按 applied 汇报。
+  - 发现并修复两个问题：队长在界面切换模型后，follow 被误报 WARNING；run_code 模式下队长看不到 `member-model:` 说明。修复后需要按 `scripts/live-checklist.md` 复验这两项。
 
 更早版本的验收记录见 `CHANGELOG.md`。

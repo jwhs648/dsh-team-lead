@@ -7,7 +7,9 @@ import {
   deferred,
   makeAgent,
   noteOf,
+  resolveChildOptions,
 } from "./helpers/harness.mjs";
+import { leadRoute } from "../lib/routes.js";
 
 const LEAD_OPTIONS = { provider: "lp", model: "lm", reasoningEffort: "medium" };
 const lead = (id = "lead") => makeAgent(id, { options: { ...LEAD_OPTIONS } });
@@ -436,4 +438,80 @@ test("建队员调用自带路由：有登记时登记优先；没有登记且�
   assert.deepEqual(open.lastTeammateOptions(), { provider: "xp", model: "xm" });
   assert.match(noteOf(second), /^member-model: "b" → xp\/xm · effort unset \(the request's own route; verified on the live teammate\)\.$/);
   assert.equal((await open.get(agent)).applied.at(-1).source, "explicit");
+});
+
+// —— 实机验收发现的两个问题（2026-09-25） ——
+
+// 宿主给子 agent 继承的是队长「最近一次请求头」里的路由（界面切换的模型会体现在这里），
+// 创建参数只在第一次请求之前才作数。夹具按同样的规则生成子 agent 的 options。
+const hostChildOptions = (parentOptions, requested, parent) => {
+  const config = parent?.session?.requestHeader?.()?.config;
+  const inherited = config === undefined
+    ? parentOptions
+    : { provider: config.provider, model: config.model, ...(config.reasoningEffort === undefined ? {} : { reasoningEffort: config.reasoningEffort }) };
+  return resolveChildOptions(inherited, requested);
+};
+const switchedLead = (id = "lead") => makeAgent(id, {
+  options: { provider: "st", model: "deepseek-v4.1-flash" },
+  session: { header: { id }, requestHeader: () => ({ config: { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium", maxTokens: 128000 } }) },
+});
+
+test("队长在界面切换过模型：follow 按队长当前路由核实，不再误报", async () => {
+  const h = createHarness({ childOptions: hostChildOptions });
+  const agent = switchedLead();
+  await h.arm({ follow: true }, agent);
+  const result = await h.spawnTeammate({ name: "follower" }, agent);
+  assert.equal(noteOf(result), 'member-model: "follower" → stgpt/gpt-6-astra · medium (armed follow, same as the lead; verified on the live teammate).');
+  assert.deepEqual((await h.get(agent)).applied.at(-1), { teammate: "follower", source: "follow", route: { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium" }, verified: true });
+});
+
+test("队长在界面切换过模型：关闭 requireArm 后未登记跟随，同样按当前路由核实", async () => {
+  const h = createHarness({ childOptions: hostChildOptions, config: { inherit: true, requireArm: false } });
+  const agent = switchedLead();
+  const result = await h.spawnTeammate({ name: "plain" }, agent);
+  assert.equal(noteOf(result), 'member-model: "plain" → stgpt/gpt-6-astra · medium (nothing armed, follows the lead; requireArm is off; verified on the live teammate).');
+});
+
+test("队长路由：请求头优先；还没发过请求或读取出错时退回创建参数", () => {
+  assert.deepEqual(leadRoute(switchedLead()), { provider: "stgpt", model: "gpt-6-astra", reasoningEffort: "medium" });
+  assert.deepEqual(leadRoute(makeAgent("a", { options: { provider: "p", model: "m", reasoningEffort: "low" }, session: { requestHeader: () => undefined } })), { provider: "p", model: "m", reasoningEffort: "low" });
+  assert.deepEqual(leadRoute(makeAgent("b", { options: { provider: "p", model: "m" }, session: { requestHeader: () => { throw new Error("closed"); } } })), { provider: "p", model: "m" });
+  assert.deepEqual(leadRoute(makeAgent("c", { options: { provider: "p", model: "m", reasoningEffort: "high" }, session: { requestHeader: () => ({ config: { provider: "q", model: "n" } }) } })), { provider: "q", model: "n" }, "请求头没写强度时不沿用创建参数里的强度");
+});
+
+// run_code（PTC）里调用工具时，程序拿到的是结构化值，看不到结果文本；
+// 宿主会把子调用的 additionalContexts 转交给 run_code 的结果，所以说明改走这条路。
+const RUN_CODE = { parent: Symbol("run_code") };
+
+test("run_code 里建队员：说明不写进结果文本，改作附加上下文送达队长", async () => {
+  const h = createHarness();
+  const agent = lead();
+  await h.arm({ provider: "p", model: "m", reasoningEffort: "high" }, agent);
+  const result = await h.spawnTeammate({ name: "ptc" }, agent, RUN_CODE);
+  assert.equal(result.isError, false);
+  assert.equal(noteOf(result), undefined, "结果文本里没有说明");
+  const [context] = result.additionalContexts;
+  assert.equal(context.role, "user");
+  assert.equal(context.source.kind, "member-model");
+  assert.equal(context.content[0].text, 'member-model: "ptc" → p/m · high (armed route; verified on the live teammate).');
+});
+
+test("run_code 里 WARNING、创建失败和 fork 的说明也走附加上下文", async () => {
+  const followH = createHarness();
+  const agent = switchedLead();
+  await followH.arm({ provider: "p", model: "m" }, agent);
+  const mismatch = createHarness({ childOptions: () => ({ provider: "x", model: "y" }) });
+  await mismatch.arm({ provider: "p", model: "m" }, agent);
+  const warned = await mismatch.spawnTeammate({ name: "w" }, agent, RUN_CODE);
+  assert.match(warned.additionalContexts[0].content[0].text, /^member-model: WARNING "w" should run p\/m/);
+
+  const failing = createHarness({ continuableImpl: async () => { throw new Error("provider down"); } });
+  await failing.arm({ provider: "p", model: "m" }, agent);
+  const failed = await failing.spawnTeammate({ name: "f" }, agent, RUN_CODE);
+  assert.equal(failed.isError, true);
+  assert.match(failed.additionalContexts[0].content[0].text, /stays armed for a retry/);
+
+  const fork = await followH.spawnTeammate({ name: "k", context: "fork" }, agent, RUN_CODE);
+  assert.match(fork.additionalContexts[0].content[0].text, /^member-model: fork follows the lead; the p\/m stays armed/);
+  assert.equal(noteOf(fork), undefined);
 });

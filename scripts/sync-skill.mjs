@@ -23,6 +23,7 @@ const PREAMBLE = "(开头)";
 const ROUTE_FIELDS = ["provider", "model", "reasoningEffort"];
 
 // 已发布的 SKILL.md 模板指纹：每节正文的 sha256 前 16 位，「默认路由」一节不计。
+// 1.2.0-pre 是 2026-09-25 实机验收前装过的 1.2.0 版本，登记在这里，才能把它平滑升级到修复后的 1.2.0。
 // 发布新版 skill 时在这里登记新版本（tests/sync-skill.test.mjs 会检查当前版本已登记）。
 export const KNOWN_SKILL_TEMPLATES = {
   "1.0.0": {
@@ -41,7 +42,7 @@ export const KNOWN_SKILL_TEMPLATES = {
     "每次创建": "99fce34207e5bf57",
     "约束": "6e0bd017268530bc",
   },
-  "1.2.0": {
+  "1.2.0-pre": {
     "(开头)": "586c599aedfae758",
     "分工": "4233f5732a599357",
     "工作流程": "49c99dd1cead78f2",
@@ -52,12 +53,24 @@ export const KNOWN_SKILL_TEMPLATES = {
     "每次创建": "9b487ab3bea10445",
     "约束": "e25c3728a9cc0b98",
   },
+  "1.2.0": {
+    "(开头)": "586c599aedfae758",
+    "分工": "4233f5732a599357",
+    "工作流程": "49c99dd1cead78f2",
+    "什么时候委派": "b47737ba6039c1ca",
+    "怎么交代任务": "1b8347eba5077e5b",
+    "怎么持续沟通": "7688c642fdc07c22",
+    "怎么等待和验收": "733b0d81f76c0889",
+    "每次创建": "90f4d97f12975f44",
+    "约束": "e25c3728a9cc0b98",
+  },
 };
 
 // 已发布的 references 文件指纹（整文件 sha256 前 16 位）。
 export const KNOWN_REFERENCE_FILES = {
   "references/spawn-route.md": {
-    "1.2.0": "988b2708c1e75391",
+    "1.2.0-pre": "988b2708c1e75391",
+    "1.2.0": "986f05c10a4e12ee",
   },
 };
 

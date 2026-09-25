@@ -5,7 +5,7 @@ team-lead skill 的补充说明。遇到下面的情况时，查对应的一节�
 | 遇到 | 看 |
 | --- | --- |
 | 要创建多位队员，或想把登记和创建写在同一步 | 同一步里登记和创建 |
-| 看不懂 `member-model:` 说明，或找不到它 | member-model: 说明 |
+| 看不懂结果末尾的 `member-model:` 行 | 结果末尾的 member-model: 行 |
 | 汇报要列出各队员的实际路由 | applied：各队员的实际路由 |
 | `list_agents` 显示的模型和结果行对不上 | list_agents 里的模型字段 |
 | 被拒绝：`MEMBER_MODEL_ARM_REQUIRED` | 被要求先登记 |
@@ -37,13 +37,11 @@ team-lead skill 的补充说明。遇到下面的情况时，查对应的一节�
 - 正确写法：`arm A → spawn A → arm B → spawn B`。各队员拿到各自登记的路由。
 - 错误写法：`arm A → arm B → spawn A → spawn B`。第二次登记会顶掉第一次，于是 A 拿到 B 的路由，B 被拒绝。
 - 登记失败时（路由不可用，或返回 armed:false），同一步里紧随的创建会被拒绝（`MEMBER_MODEL_ARM_REQUIRED`），不会创建队员。改正登记后重新创建。
-- 如果插件关闭了 requireArm，紧随的创建会改为跟随队长，说明里会注明。按「每次创建」第 3 步核对。
+- 如果插件关闭了 requireArm，紧随的创建会改为跟随队长，结果行会注明。按「每次创建」第 3 步核对。
 
 ## 看结果
 
-### member-model: 说明
-
-每次创建都会给出一行 `member-model:` 说明。普通调用时，它附在工具结果末尾；在 run_code 里调用时，程序拿到的返回值里没有这一行，它会作为单独的提示出现在运行结果之后。两处都看不到时，用 `get_spawn_route` 的 `applied` 核对。
+### 结果末尾的 member-model: 行
 
 - `"名字" → provider/model · 强度 (armed route; verified on the live teammate)`：按登记创建，已在队员身上核实。
 - `(armed follow, same as the lead; verified ...)`：按登记跟随队长，已核实与队长一致。
@@ -66,7 +64,7 @@ team-lead skill 的补充说明。遇到下面的情况时，查对应的一节�
 - `list_agents` 里不在运行的队员（例如刚重启、尚未恢复）显示的是队长的模型，不代表队员的路由。
 - `spawn_teammate` 和 `list_agents` 返回的 `provider` 是创建方式（spawn 或 fork），不是模型供应商；`model` 只有模型名，不含供应商和思考强度。
 
-核对完整路由，以 `member-model:` 说明和 `applied` 为准。
+核对完整路由，以 `member-model:` 行和 `applied` 为准。
 
 ## 出问题时
 
@@ -76,7 +74,7 @@ team-lead skill 的补充说明。遇到下面的情况时，查对应的一节�
 
 ### 创建失败
 
-创建失败时，`member-model:` 说明（位置同上）会写明登记是否还在：
+失败结果末尾的 `member-model:` 行会说明登记是否还在：
 
 - `stays armed for a retry`：登记已恢复，可以用同一路由直接重试。
 - `was cleared or replaced meanwhile and was not restored`：期间发生了 clear 或新的登记，旧登记不会恢复；重试前按需要重新登记。

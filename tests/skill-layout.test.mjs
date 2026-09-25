@@ -132,7 +132,7 @@ test("/team-lead 调用视为授权；汇报前用 get_spawn_route 的 applied �
 });
 
 test("任务板分派：队长在开场任务里指定，队员开工自己认领，队长不再 reassign 同一个任务", () => {
-  assert.match(skill, /开场任务写明某个任务归你时，开工先认领（claim）它，完成后标记 complete/);
+  assert.match(skill, /开场任务写明了某个任务 id 归你时，开工先认领（claim）它，完成后标记 complete；没写就不用看任务板/);
   assert.match(sectionOf("怎么持续沟通"), /谁做哪个任务由队长在开场任务里写明，队员开工时自己认领；队长不要再 reassign 同一个任务/);
   assert.doesNotMatch(skill, /创建队员后用 `team_task_update` 的 reassign 把任务分给他/);
 });
@@ -147,7 +147,10 @@ test("登记和创建可以写在同一步，但必须一对一对地写", () =>
 
 test("核对时只看 member-model 行；上下文被压缩后重新加载 skill", () => {
   assert.match(sectionOf("每次创建"), /结果 JSON 里的 `provider` 是创建方式（spawn 或 fork），不是模型供应商/);
-  assert.match(sectionOf("每次创建"), /把这一行原样告诉用户，并用中文说明哪里不一致/);
+  assert.match(sectionOf("每次创建"), /把这条说明原样告诉用户，并用中文说明哪里不一致/);
+  assert.match(sectionOf("每次创建"), /在 run_code 里调用时，它作为单独的提示出现在运行结果之后/);
+  assert.match(sectionOf("每次创建"), /看不到说明时，用 `get_spawn_route` 的 `applied` 核对/);
+  assert.match(reference, /在 run_code 里调用时，程序拿到的返回值里没有这一行/);
   assert.match(sectionOf("怎么交代任务"), /先重新加载 team-lead skill，不要凭记忆改写/);
 });
 

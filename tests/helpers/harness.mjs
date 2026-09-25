@@ -156,7 +156,7 @@ export function createCtx(options = {}) {
     const depth = depthOf(parent) + 1;
     const child = makeScopedAgent(spec.childId, {
       depth,
-      options: childOptions(parent?.options ?? {}, spec.request?.agentOptions ?? {}),
+      options: childOptions(parent?.options ?? {}, spec.request?.agentOptions ?? {}, parent),
     });
     child.session.header.parentSession = parent?.id;
     live.set(child.id, child);
@@ -260,6 +260,8 @@ export function createCtx(options = {}) {
       arguments: args,
       agent,
       signal: extra.signal ?? new AbortController().signal,
+      // run_code 里的子调用：宿主给它带上 parent（run_code 那次执行的 token）。
+      ...(extra.parent !== undefined ? { parent: extra.parent } : {}),
     };
     const body = async () => {
       try {

@@ -41,8 +41,9 @@ const SAFE_ARG = /^[^\s&|<>^"'`]+$/;
 // team-lead skill 的文件（相对仓库根目录）。
 export const SKILL_FILES = ["skills/team-lead/SKILL.md", "skills/team-lead/references/spawn-route.md"];
 const PLUGIN_TOOLS = new Set(["arm_spawn_route", "get_spawn_route", "clear_spawn_route"]);
-// skill 里出现、但不是工具名的 snake_case 词（宿主工具的参数名）。
-const TOOL_PARAMETERS = new Set(["timeout_ms"]);
+// skill 里出现、但不是 Agent Teams 工具的 snake_case 词：宿主工具的参数名，以及宿主
+// 自带的 run_code（PTC 传输工具，由 dsh-tools 提供，不在 Agent Teams 工具集里）。
+const TOOL_PARAMETERS = new Set(["timeout_ms", "run_code"]);
 
 // skill 不再复述、交给宿主 team:policy 的规则。宿主改写或删掉任何一条，都要人工确认
 // skill 是否需要补回相应说明。
@@ -227,8 +228,10 @@ export function runChecks(cache, version, manifest, skillText = "") {
     ["async startContinuable(spec)", /^\s*async startContinuable\(\s*\w+\s*\)\s*\{/],
   ]));
 
-  add("K04", "子 agent 路由合并：继承父路由、换路由未写强度时清掉强度、写入 subagentDepth", requireAll(subagent, [
+  add("K04", "子 agent 路由合并：继承父路由（请求头优先）、换路由未写强度时清掉强度、写入 subagentDepth", requireAll(subagent, [
     ["function resolveChildAgentOptions(", /function resolveChildAgentOptions\(/],
+    ["父路由取自最近一次请求头（插件的 leadRoute 按同样规则核实跟随）", /const requestConfig = parent\.session\.requestHeader\(\)\?\.config;/],
+    ["resolveChildAgentOptions 用 parentAgentOptionsForDelegation(parent)", /const parentOptions = parentAgentOptionsForDelegation\(parent\);/],
     ["换路由且未请求强度时 delete reasoningEffort", /provider !== \w+ \|\| \w+\.model !== \w+\) && \w+\?\.reasoningEffort === void 0\) delete \w+\.reasoningEffort/],
     ["subagentDepth: childDepth", /subagentDepth: childDepth/],
     ["startContinuable 用 resolveChildAgentOptions(parent, request.agentOptions, …)", /resolveChildAgentOptions\(parent, request\.agentOptions,/],
@@ -387,6 +390,13 @@ export function runChecks(cache, version, manifest, skillText = "") {
     outcome.pass = outcome.missing.length === 0;
     add("K20", "同一步里的 arm_spawn_route → spawn_teammate 按顺序逐个执行（两者都是独占调用）", outcome);
   }
+
+  // K21：run_code 里的子调用拿不到结果文本，插件的说明改走 additionalContexts；
+  // 依赖宿主把子调用的 additionalContexts 转交给 run_code 的结果，并给子调用标上 parent。
+  add("K21", "run_code 子调用：带 parent，结果的 additionalContexts 转交给 run_code", requireAll(tools, [
+    ["子调用带 parent: exec.token", /^\s*parent: exec\.token,$/],
+    ["子调用的 additionalContexts → exec.deferContext", /for \(const context of result\.additionalContexts \?\? \[\]\) exec\.deferContext\(context\);/],
+  ]));
 
   return results;
 }

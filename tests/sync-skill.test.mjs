@@ -195,3 +195,20 @@ test("写入失败（目标是一个文件）：退出码 2 并说明原因", ()
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("从验收前装过的 1.2.0 升级：认出 1.2.0-pre，SKILL.md 与 references 都按已发布版本更新", () => {
+  const pre = readFileSync(new URL("./fixtures/team-lead-skill-1.2.0-pre.md", import.meta.url), "utf8");
+  const preReference = readFileSync(new URL("./fixtures/spawn-route-1.2.0-pre.md", import.meta.url), "utf8");
+  const { target, cleanup } = workspace({ "SKILL.md": fillRoute(pre, ROUTE).replace(/\n/g, "\r\n"), "references/spawn-route.md": preReference });
+  try {
+    const plan = planSync({ sourceDir, targetDir: target });
+    assert.equal(plan.matched, "1.2.0-pre");
+    assert.deepEqual(plan.customized, []);
+    assert.deepEqual(plan.writes.map(({ path, action }) => [path, action]), [["SKILL.md", "更新"], ["references/spawn-route.md", "更新"]]);
+    applySync(plan, { stamp: "t4" });
+    assert.equal(readFileSync(join(target, "SKILL.md"), "utf8"), fillRoute(template, ROUTE));
+    assert.equal(readFileSync(join(target, "references", "spawn-route.md"), "utf8"), reference);
+  } finally {
+    cleanup();
+  }
+});
