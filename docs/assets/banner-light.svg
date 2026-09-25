@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc">
+  <title id="title">dsh-team-lead</title>
+  <desc id="desc">让智能体团队按任务分工，为每位队员指定并核实模型。Team-lead skill + per-teammate model routing for DeepSeek Harness.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7FAFF"/>
+      <stop offset="1" stop-color="#E5EEFF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#145AF3"/>
+      <stop offset="1" stop-color="#45D9E7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#45D9E7" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#45D9E7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="dotsMask"><rect x="560" width="720" height="360" fill="url(#fade)"/></mask>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#145AF3" fill-opacity="0.085"/>
+    </pattern>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#145AF3" flood-opacity="0.13"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-40%" width="140%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#145AF3" flood-opacity="0.104"/>
+    </filter>
+    <clipPath id="frame"><rect width="1280" height="360" rx="24"/></clipPath>
+  </defs>
+  <style>
+    .sans { font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Hiragino Sans GB', sans-serif; }
+    .latin { font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', monospace; }
+    .flow { stroke-dasharray: 3 13; animation: flow 1.4s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -32; } }
+    @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
+  </style>
+  <g clip-path="url(#frame)">
+    <rect width="1280" height="360" fill="url(#bg)"/>
+    <rect x="560" width="720" height="360" fill="url(#dots)" mask="url(#dotsMask)"/>
+    <ellipse cx="1020" cy="186" rx="330" ry="210" fill="url(#glow)"/>
+  </g>
+  <rect x="0.75" y="0.75" width="1278.5" height="358.5" rx="23.25" fill="none" stroke="#D6E4FB" stroke-width="1.5"/>
+  <g>
+    <rect x="72" y="54" width="316" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.85" stroke="#CFE0FF" stroke-width="1.2"/>
+    <circle cx="93" cy="72" r="5.5" fill="url(#accent)"/>
+    <text x="108" y="78" class="latin" font-size="16" font-weight="600" fill="#145AF3" letter-spacing="0.2">DeepSeek Harness · Agent Teams</text>
+    <text x="69" y="160" class="latin" font-size="70" font-weight="800" fill="#0B1B3F" letter-spacing="-1.5">dsh-team-lead</text>
+    <rect x="73" y="178" width="116" height="6" rx="3" fill="url(#accent)"/>
+    <text x="72" y="234" class="sans" font-size="31" font-weight="600" fill="#22324F">让智能体团队<tspan fill="#145AF3">按任务分工</tspan>，</text>
+    <text x="72" y="278" class="sans" font-size="31" font-weight="600" fill="#22324F">为每位队员<tspan fill="#145AF3">指定并核实模型</tspan></text>
+    <text x="72" y="320" class="latin" font-size="18" fill="#5A6A8B">Team-lead skill + per-teammate model routing for DeepSeek Harness</text>
+  </g>
+  <g>
+    <path d="M898 176.0 C948 176.0 910 96 960 96" fill="none" stroke="#B4CCF5" stroke-width="2.5" stroke-linecap="round"/>
+    <path class="flow" d="M898 176.0 C948 176.0 910 96 960 96" fill="none" stroke="#145AF3" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+    <path d="M898 176.0 C948 176.0 910 186 960 186" fill="none" stroke="#B4CCF5" stroke-width="2.5" stroke-linecap="round"/>
+    <path class="flow" d="M898 176.0 C948 176.0 910 186 960 186" fill="none" stroke="#145AF3" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+    <path d="M898 176.0 C948 176.0 910 276 960 276" fill="none" stroke="#B4CCF5" stroke-width="2.5" stroke-linecap="round"/>
+    <path class="flow" d="M898 176.0 C948 176.0 910 276 960 276" fill="none" stroke="#145AF3" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="770" y="112" width="128" height="128" rx="32" fill="#FFFFFF" stroke="#DCE7FB" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(785.4 125.4) scale(2.7)">
+    <circle cx="11.5" cy="12" r="4" fill="#145AF3"/>
+    <path d="M4.5 25C4.5 21.134 7.634 18 11.5 18C15.366 18 18.5 21.134 18.5 25V27H4.5V25Z" fill="#7CB7FF"/>
+    <rect x="18.5" y="10.9" width="7.5" height="2.2" rx="1.1" fill="#F2AF63"/>
+    <path d="M24.2 7.6L29 12L24.2 16.4V7.6Z" fill="#F2AF63"/>
+    <rect x="21" y="18" width="10" height="9" rx="2.5" fill="#45D9E7"/>
+    <rect x="23.6" y="21.6" width="4.8" height="1.8" rx="0.9" fill="#FFFFFF"/>
+  </g>
+  <circle cx="898" cy="176.0" r="6" fill="#FFFFFF" stroke="#145AF3" stroke-width="2.5"/>
+  <text x="834.0" y="274" text-anchor="middle" class="sans" font-size="18" font-weight="700" fill="#22324F">队长</text>
+  <text x="834.0" y="296" text-anchor="middle" class="latin" font-size="14" fill="#5A6A8B">team-lead skill</text>
+  <g>
+    <g filter="url(#soft)"><rect x="960" y="61.0" width="272" height="70" rx="18" fill="#FFFFFF" stroke="#DCE7FB" stroke-width="1.2"/></g>
+    <circle cx="960" cy="96" r="5" fill="#FFFFFF" stroke="#145AF3" stroke-width="2.2"/>
+    <circle cx="994" cy="96" r="17" fill="#145AF3"/>
+    <circle cx="994" cy="92.82" r="3.79" fill="#FFFFFF"/><path d="M987.10 104.32 C987.10 98.80 990.32 97.53 994.00 97.53 C997.68 97.53 1000.90 98.80 1000.90 104.32 Z" fill="#FFFFFF"/>
+    <text x="1022" y="90" class="mono" font-size="16" font-weight="700" fill="#0B1B3F">kc-json</text>
+    <text x="1022" y="113" class="sans" font-size="14" fill="#5A6A8B">provider-a/model-a · high</text>
+    <circle cx="1208" cy="85" r="9.5" fill="#2EA44F"/><path d="M1204.03 85.17 L1206.79 87.94 L1212.15 82.06" fill="none" stroke="#FFFFFF" stroke-width="2.07" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <g filter="url(#soft)"><rect x="960" y="151.0" width="272" height="70" rx="18" fill="#FFFFFF" stroke="#DCE7FB" stroke-width="1.2"/></g>
+    <circle cx="960" cy="186" r="5" fill="#FFFFFF" stroke="#145AF3" stroke-width="2.2"/>
+    <circle cx="994" cy="186" r="17" fill="#F2AF63"/>
+    <circle cx="994" cy="182.82" r="3.79" fill="#FFFFFF"/><path d="M987.10 194.32 C987.10 188.80 990.32 187.53 994.00 187.53 C997.68 187.53 1000.90 188.80 1000.90 194.32 Z" fill="#FFFFFF"/>
+    <text x="1022" y="180" class="mono" font-size="16" font-weight="700" fill="#0B1B3F">sync-json</text>
+    <text x="1022" y="203" class="sans" font-size="14" fill="#5A6A8B">provider-b/model-b · medium</text>
+    <circle cx="1208" cy="175" r="9.5" fill="#2EA44F"/><path d="M1204.03 175.17 L1206.79 177.94 L1212.15 172.06" fill="none" stroke="#FFFFFF" stroke-width="2.07" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <g filter="url(#soft)"><rect x="960" y="241.0" width="272" height="70" rx="18" fill="#FFFFFF" stroke="#DCE7FB" stroke-width="1.2"/></g>
+    <circle cx="960" cy="276" r="5" fill="#FFFFFF" stroke="#145AF3" stroke-width="2.2"/>
+    <circle cx="994" cy="276" r="17" fill="#45D9E7"/>
+    <circle cx="994" cy="272.82" r="3.79" fill="#FFFFFF"/><path d="M987.10 284.32 C987.10 278.80 990.32 277.54 994.00 277.54 C997.68 277.54 1000.90 278.80 1000.90 284.32 Z" fill="#FFFFFF"/>
+    <text x="1022" y="270" class="mono" font-size="16" font-weight="700" fill="#0B1B3F">docs</text>
+    <text x="1022" y="293" class="sans" font-size="14" fill="#5A6A8B">follow · 跟随队长</text>
+    <circle cx="1208" cy="265" r="9.5" fill="#2EA44F"/><path d="M1204.03 265.17 L1206.79 267.94 L1212.15 262.06" fill="none" stroke="#FFFFFF" stroke-width="2.07" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="530" viewBox="0 0 1200 530" role="img" aria-labelledby="title desc">
+  <title id="title">dsh-team-lead 的工作方式</title>
+  <desc id="desc">四步：你用 /team-lead 发起；队长拆分并交代任务；每位 fresh 队员先 arm_spawn_route 登记路由再 spawn_teammate 创建；member-model 在运行中的队员身上核实实际路由，队长验收后按 applied 汇报。</desc>
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#145AF3"/>
+      <stop offset="1" stop-color="#45D9E7"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#000000" flood-opacity="0.338"/>
+    </filter>
+  </defs>
+  <style>
+    .sans { font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Hiragino Sans GB', sans-serif; }
+    .latin { font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', monospace; }
+  </style>
+  <rect x="0.75" y="0.75" width="1198.5" height="528.5" rx="22" fill="#0F1829" stroke="#1E2B44" stroke-width="1.5"/>
+  <g>
+    <g filter="url(#soft)"><rect x="36.0" y="36" width="249.0" height="318" rx="20" fill="#14223B" stroke="#263858" stroke-width="1.2"/></g>
+    <rect x="58.0" y="36" width="205.0" height="4" rx="2" fill="#F2AF63"/>
+    <circle cx="75.0" cy="80" r="17" fill="#F2AF63"/>
+    <text x="75.0" y="86" text-anchor="middle" class="latin" font-size="17" font-weight="700" fill="#FFFFFF">1</text>
+    <text x="102.0" y="86" class="sans" font-size="14" font-weight="600" fill="#8EA2C6">你</text>
+    <text x="58.0" y="138" class="sans" font-size="25" font-weight="700" fill="#EEF4FF">发起</text>
+    <rect x="58.0" y="166" width="205.0" height="80" rx="14" fill="#0E192C" stroke="#22314D" stroke-width="1.2"/>
+    <text x="74.0" y="198" class="mono" font-size="16" font-weight="700" fill="#7CB7FF">/team-lead</text>
+    <text x="74.0" y="226" class="sans" font-size="15" fill="#8EA2C6">调查并修复登录超时</text>
+    <circle cx="239.0" cy="220" r="13" fill="#3D7BFF"/>
+    <path d="M234.0 220 H244.0 M239.5 215 L244.5 220 L239.5 225" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="58.0" y="294" class="sans" font-size="16.5" fill="#C9D6EF">一句话描述任务，</text>
+    <text x="58.0" y="321" class="sans" font-size="16.5" fill="#C9D6EF">就是明确授权组队。</text>
+  </g>
+  <circle cx="307.0" cy="195.0" r="16" fill="#14223B" stroke="#263858" stroke-width="1.5"/><path d="M303.0 188.5 L310.5 195.0 L303.0 201.5" fill="none" stroke="#3D7BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>
+    <g filter="url(#soft)"><rect x="329.0" y="36" width="249.0" height="318" rx="20" fill="#14223B" stroke="#263858" stroke-width="1.2"/></g>
+    <rect x="351.0" y="36" width="205.0" height="4" rx="2" fill="#145AF3"/>
+    <circle cx="368.0" cy="80" r="17" fill="#145AF3"/>
+    <text x="368.0" y="86" text-anchor="middle" class="latin" font-size="17" font-weight="700" fill="#FFFFFF">2</text>
+    <text x="395.0" y="86" class="sans" font-size="14" font-weight="600" fill="#8EA2C6">队长 · team-lead skill</text>
+    <text x="351.0" y="138" class="sans" font-size="25" font-weight="700" fill="#EEF4FF">拆分与交代</text>
+    <rect x="351.0" y="162" width="205.0" height="26" rx="8" fill="#0E192C" stroke="#22314D" stroke-width="1.1"/>
+    <circle cx="366.0" cy="175" r="5" fill="#F2AF63"/>
+    <text x="380.0" y="180" class="sans" font-size="14" font-weight="600" fill="#C9D6EF">调查</text>
+    <text x="544.0" y="180" text-anchor="end" class="sans" font-size="13.5" fill="#8EA2C6">队员 A</text>
+    <rect x="351.0" y="194" width="205.0" height="26" rx="8" fill="#0E192C" stroke="#22314D" stroke-width="1.1"/>
+    <circle cx="366.0" cy="207" r="5" fill="#45D9E7"/>
+    <text x="380.0" y="212" class="sans" font-size="14" font-weight="600" fill="#C9D6EF">实现</text>
+    <text x="544.0" y="212" text-anchor="end" class="sans" font-size="13.5" fill="#8EA2C6">队员 B</text>
+    <rect x="351.0" y="226" width="205.0" height="26" rx="8" fill="#0E192C" stroke="#22314D" stroke-width="1.1"/>
+    <circle cx="366.0" cy="239" r="5" fill="#145AF3"/>
+    <text x="380.0" y="244" class="sans" font-size="14" font-weight="600" fill="#C9D6EF">整合</text>
+    <text x="544.0" y="244" text-anchor="end" class="sans" font-size="13.5" fill="#8EA2C6">队长</text>
+    <text x="351.0" y="294" class="sans" font-size="16.5" fill="#C9D6EF">拆出能并行的工作块，</text>
+    <text x="351.0" y="321" class="sans" font-size="16.5" fill="#C9D6EF">写清背景、范围和交付。</text>
+  </g>
+  <circle cx="600.0" cy="195.0" r="16" fill="#14223B" stroke="#263858" stroke-width="1.5"/><path d="M596.0 188.5 L603.5 195.0 L596.0 201.5" fill="none" stroke="#3D7BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>
+    <g filter="url(#soft)"><rect x="622.0" y="36" width="249.0" height="318" rx="20" fill="#14223B" stroke="#263858" stroke-width="1.2"/></g>
+    <rect x="644.0" y="36" width="205.0" height="4" rx="2" fill="#1FB5CC"/>
+    <circle cx="661.0" cy="80" r="17" fill="#1FB5CC"/>
+    <text x="661.0" y="86" text-anchor="middle" class="latin" font-size="17" font-weight="700" fill="#FFFFFF">3</text>
+    <text x="688.0" y="86" class="sans" font-size="14" font-weight="600" fill="#8EA2C6">队长 + member-model</text>
+    <text x="644.0" y="138" class="sans" font-size="25" font-weight="700" fill="#EEF4FF">登记 → 创建</text>
+    <rect x="644.0" y="164" width="171.0" height="30" rx="15.0" fill="#0E192C" stroke="#22314D" stroke-width="1.2"/><text x="729.5" y="184.4" text-anchor="middle" class="mono" font-size="15" font-weight="600" fill="#7CB7FF">arm_spawn_route</text>
+    <path d="M729.5 198 V215 M724.5 210 L729.5 216 L734.5 210" fill="none" stroke="#62759A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="644.0" y="220" width="171.0" height="30" rx="15.0" fill="#0E192C" stroke="#22314D" stroke-width="1.2"/><text x="729.5" y="240.4" text-anchor="middle" class="mono" font-size="15" font-weight="600" fill="#5BE0EE">spawn_teammate</text>
+    <path d="M825.0 172 H833.0 V242 H825.0" fill="none" stroke="#35507E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="839.0" y="212" class="latin" font-size="14" font-weight="700" fill="#8EA2C6">×N</text>
+    <text x="644.0" y="294" class="sans" font-size="16.5" fill="#C9D6EF">一次登记只给紧接着的</text>
+    <text x="644.0" y="321" class="sans" font-size="16.5" fill="#C9D6EF">这一位；fork 无需登记。</text>
+  </g>
+  <circle cx="893.0" cy="195.0" r="16" fill="#14223B" stroke="#263858" stroke-width="1.5"/><path d="M889.0 188.5 L896.5 195.0 L889.0 201.5" fill="none" stroke="#3D7BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>
+    <g filter="url(#soft)"><rect x="915.0" y="36" width="249.0" height="318" rx="20" fill="#14223B" stroke="#263858" stroke-width="1.2"/></g>
+    <rect x="937.0" y="36" width="205.0" height="4" rx="2" fill="#2EA043"/>
+    <circle cx="954.0" cy="80" r="17" fill="#2EA043"/>
+    <text x="954.0" y="86" text-anchor="middle" class="latin" font-size="17" font-weight="700" fill="#FFFFFF">4</text>
+    <text x="981.0" y="86" class="sans" font-size="14" font-weight="600" fill="#8EA2C6">member-model → 队长</text>
+    <text x="937.0" y="138" class="sans" font-size="25" font-weight="700" fill="#EEF4FF">核实与汇报</text>
+    <rect x="937.0" y="164" width="205.0" height="38" rx="10" fill="#11301E" stroke="#1F5A33" stroke-width="1.1"/>
+    <circle cx="957.0" cy="183" r="9" fill="#2EA043"/><path d="M953.24 183.16 L955.85 185.78 L960.93 180.22" fill="none" stroke="#FFFFFF" stroke-width="1.96" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="975.0" y="188" class="sans" font-size="13" font-weight="600" fill="#3FB950">已核实 · model-a · high</text>
+    <rect x="937.0" y="212" width="205.0" height="38" rx="10" fill="#2D2310" stroke="#5C4516" stroke-width="1.1"/>
+    <path d="M957.00 222.41 L965.59 238.77 L948.41 238.77 Z" fill="#D29922" stroke="#D29922" stroke-width="1.64" stroke-linejoin="round"/><rect x="956.02" y="227.56" width="1.96" height="5.24" rx="0.98" fill="#FFFFFF"/><circle cx="957.00" cy="235.42" r="1.10" fill="#FFFFFF"/>
+    <text x="975.0" y="236" class="sans" font-size="13" font-weight="600" fill="#E3B341">WARNING → 停下告诉你</text>
+    <text x="937.0" y="294" class="sans" font-size="16.5" fill="#C9D6EF">逐位核实实际路由；</text>
+    <text x="937.0" y="321" class="sans" font-size="16.5" fill="#C9D6EF">汇报按 applied 列出。</text>
+  </g>
+  <g>
+    <rect x="36.0" y="380" width="552.0" height="88" rx="16" fill="#14223B" stroke="#263858" stroke-width="1.2" stroke-dasharray="0"/>
+    <path d="M72.0 407.0 L86.0 412.5 V423.0 C86.0 433.0 79.5 438.5 72.0 442.0 C64.5 438.5 58.0 433.0 58.0 423.0 V412.5 Z" fill="#3D7BFF"/>
+    <path d="M66.5 424.5 L70.5 428.5 L78.0 420.0" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="104.0" y="412" class="sans" font-size="17" font-weight="700" fill="#EEF4FF">忘了登记？会被拦下</text>
+    <text x="104.0" y="436" class="sans" font-size="14.5" fill="#8EA2C6">requireArm 默认开启：既没登记、也没有插件默认路由时，</text>
+    <text x="104.0" y="456" class="sans" font-size="14.5" fill="#8EA2C6">fresh 队员的创建会被拒绝，不会静默跟随队长的模型。</text>
+  </g>
+  <g>
+    <rect x="612.0" y="380" width="552.0" height="88" rx="16" fill="#14223B" stroke="#263858" stroke-width="1.2" stroke-dasharray="5 5"/>
+    <g fill="none" stroke="#5BE0EE" stroke-width="2.6" stroke-linecap="round">
+      <path d="M641.0 413.0 V435.0"/>
+      <path d="M656.0 413.0 V419.0 C656.0 425.0 641.0 424.0 641.0 429.0"/>
+    </g>
+    <circle cx="641.0" cy="411.0" r="4.2" fill="#14223B" stroke="#5BE0EE" stroke-width="2.6"/>
+    <circle cx="656.0" cy="411.0" r="4.2" fill="#14223B" stroke="#5BE0EE" stroke-width="2.6"/>
+    <circle cx="641.0" cy="437.0" r="4.2" fill="#14223B" stroke="#5BE0EE" stroke-width="2.6"/>
+    <text x="680.0" y="412" class="sans" font-size="17" font-weight="700" fill="#EEF4FF">fork 队员</text>
+    <text x="680.0" y="436" class="sans" font-size="14.5" fill="#8EA2C6">继承队长已完成的对话，跟随队长的模型，无需登记。</text>
+    <text x="680.0" y="456" class="sans" font-size="14.5" fill="#8EA2C6">要换模型或思考强度，就建 fresh 队员并登记。</text>
+  </g>
+  <text x="600.0" y="504" text-anchor="middle" class="sans" font-size="15.5" fill="#8EA2C6"><tspan font-weight="700" fill="#7CB7FF">team-lead skill</tspan> 管「怎么带队」，<tspan font-weight="700" fill="#5BE0EE">member-model 插件</tspan> 管「队员用什么模型」：两者是一个整体，一起安装、一起升级。</text>
+</svg>
